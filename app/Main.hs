@@ -5,7 +5,7 @@ module Main where
 import qualified Turtle
 import qualified Control.Foldl as L
 import Turtle.Prelude (find, shell)
-import Turtle.Shell (Shell, fold)
+import Turtle.Shell (Shell, foldIO)
 import Turtle.Pattern (suffix)
 import Turtle.Format (format, s, (%))
 import Data.Either (either)
@@ -34,5 +34,4 @@ runCommand :: Turtle.Text -> IO ()
 runCommand command = shell command Turtle.empty >>= print
 
 main :: IO ()
-main = fold (createCommand <$> getMP4Files) L.list >>=
-  \listOfCommands -> L.fold (L.Fold (\_ -> runCommand) (return ()) id) listOfCommands
+main = foldIO (createCommand <$> getMP4Files) (L.sink runCommand)
