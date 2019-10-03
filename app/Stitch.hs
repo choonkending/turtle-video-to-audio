@@ -8,14 +8,14 @@ import Turtle.Prelude (find, proc)
 import Turtle.Shell (Shell, foldIO)
 import Turtle.Pattern (suffix, has)
 import Turtle.Format (format, fp)
-import Data.Maybe (maybe)
+import Data.Maybe (fromMaybe)
 import Data.Text (stripSuffix)
 
 stripMp3Suffix :: Turtle.Text -> Turtle.Text
-stripMp3Suffix file = maybe file id (stripSuffix ".mp3" file)
+stripMp3Suffix file = fromMaybe file (stripSuffix ".mp3" file)
 
 createOutputFileName :: Turtle.Text -> Turtle.Text
-createOutputFileName filePath = (stripMp3Suffix filePath) <> "-stitched.mp3"
+createOutputFileName filePath = stripMp3Suffix filePath <> "-stitched.mp3"
 
 getMP3Files :: Shell Turtle.FilePath
 getMP3Files = find (suffix ".mp3") "/Users/Ken/Downloads/test"

@@ -8,14 +8,14 @@ import Turtle.Prelude (find, proc)
 import Turtle.Shell (Shell, foldIO)
 import Turtle.Pattern (suffix)
 import Turtle.Format (format, fp)
-import Data.Maybe (maybe)
+import Data.Maybe (fromMaybe)
 import Data.Text (stripSuffix)
 
 stripMp4Suffix :: Turtle.Text -> Turtle.Text
-stripMp4Suffix file = maybe file id (stripSuffix ".mp4" file)
+stripMp4Suffix file = fromMaybe file (stripSuffix ".mp4" file)
 
 createOutputFileName :: Turtle.Text -> Turtle.Text
-createOutputFileName filePath = (stripMp4Suffix filePath) <> ".mp3"
+createOutputFileName filePath = stripMp4Suffix filePath <> ".mp3"
 
 createArguments :: Turtle.FilePath -> [Turtle.Text]
 createArguments filePath =
