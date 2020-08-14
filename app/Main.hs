@@ -24,7 +24,7 @@ createArguments filePath =
   in ["-i", inputFileName, "-q:a", "0",  "-map", "a", outputFileName]
 
 getMP4Files :: Shell Turtle.FilePath
-getMP4Files = find (suffix ".mp4") "/Users/Ken/Downloads/test"
+getMP4Files = find (suffix ".mp4") "/Users/Ken/Downloads/convert"
 
 runCommand :: Turtle.FilePath -> IO ()
 runCommand filePath = proc "ffmpeg" (createArguments filePath) Turtle.empty >>= print

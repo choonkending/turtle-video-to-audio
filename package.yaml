@@ -24,6 +24,7 @@ dependencies:
 - turtle
 - text
 - foldl
+- containers
 
 library:
   source-dirs: src
