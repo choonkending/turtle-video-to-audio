@@ -1,0 +1,9 @@
+#!/bin/bash -ex
+
+BUILD_IMAGE='sparrow-editor'
+TAG=${BUILD_IMAGE}:latest
+
+docker-compose --file ./docker/docker-compose.yml down --volumes --remove-orphans
+docker-compose --file ./docker/docker-compose.yml build dev
+docker-compose --file ./docker/docker-compose.yml run dev
+

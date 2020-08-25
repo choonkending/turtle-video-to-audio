@@ -1,0 +1,11 @@
+#!/bin/bash -ex
+
+BUILD_IMAGE='sparrow-editor'
+TAG=${BUILD_IMAGE}:latest
+
+# ENTRYPOINT ["/bin/bash", "-l", "-c"]
+
+docker build \
+  --tag $TAG \
+  --file docker/Dockerfile.build .
+

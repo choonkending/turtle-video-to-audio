@@ -1,0 +1,16 @@
+FROM haskell:8.8.3-buster AS base
+
+# Install ffmpeg - it is required for audio editing
+RUN apt-get update && apt-get install --yes --no-install-recommends ffmpeg \
+  && rm -rf /var/lib/apt/lists/*
+
+# Set and create working directory
+ENV APP_DIR /opt/ken-ding/apps/sparrow-editor
+RUN mkdir -p $APP_DIR
+WORKDIR $APP_DIR
+
+# Copy over relevant files
+COPY package.yaml stack.yaml stack.yaml.lock video-to-audio.cabal $APP_DIR/
+COPY app/ $APP_DIR/app/
+
+CMD stack build
