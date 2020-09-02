@@ -27,7 +27,7 @@ dependencies:
 - containers
 
 library:
-  source-dirs: src
+  source-dirs: app
 
 executables:
   video-to-audio-exe:
