@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Main where
+module Convert where
 
 import qualified Turtle
 import qualified Control.Foldl as L
@@ -23,5 +23,5 @@ getMP4Files = find (suffix ".mp4") $ Turtle.fromText $ mp4FilesDirectory default
 runCommand :: Turtle.FilePath -> IO ()
 runCommand filePath = proc "ffmpeg" (createArguments filePath) Turtle.empty >>= print
 
-main :: IO ()
-main = foldIO getMP4Files (L.sink runCommand)
+convert :: IO ()
+convert = foldIO getMP4Files (L.sink runCommand)
