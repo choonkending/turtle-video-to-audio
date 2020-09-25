@@ -8,20 +8,30 @@ import Turtle.Prelude (find, proc)
 import Turtle.Shell (Shell, foldIO)
 import Turtle.Pattern (suffix)
 import Turtle.Format (format, fp)
-import Config (defaultConfig, mp4FilesDirectory, mp3FilesDirectory)
+import Config (appConfig, lookUpConfig, Config)
+import Control.Monad.Reader (Reader, runReader, asks, return)
 
-createArguments :: Turtle.FilePath -> [Turtle.Text]
-createArguments filePath =
+createArguments :: Turtle.Text -> Turtle.FilePath -> [Turtle.Text]
+createArguments mp3Directory filePath =
   let baseFileName = Turtle.basename filePath
       inputFileName = format fp filePath
-      outputFileName = mp3FilesDirectory defaultConfig <> format fp baseFileName <> ".mp3"
+      outputFileName = mp3Directory <> format fp baseFileName <> ".mp3"
   in ["-i", inputFileName, "-q:a", "0",  "-map", "a", outputFileName]
 
-getMP4Files :: Shell Turtle.FilePath
-getMP4Files = find (suffix ".mp4") $ Turtle.fromText $ mp4FilesDirectory defaultConfig
+getMP4FilesFromPath :: Turtle.Text -> Shell Turtle.FilePath
+getMP4FilesFromPath filepath = find (suffix ".mp4") $ Turtle.fromText filepath
 
-runCommand :: Turtle.FilePath -> IO ()
-runCommand filePath = proc "ffmpeg" (createArguments filePath) Turtle.empty >>= print
+getDirectories :: Reader Config (Turtle.Text, Turtle.Text)
+getDirectories = do
+  mp4Directory <- asks (lookUpConfig "MP4_DIRECTORY")
+  mp3Directory <- asks (lookUpConfig "MP3_DIRECTORY")
+  return (mp4Directory, mp3Directory)
+
+runCommand :: Turtle.Text -> Turtle.FilePath -> IO ()
+runCommand mp3Directory filePath = proc "ffmpeg" (createArguments mp3Directory filePath) Turtle.empty >>= print
 
 convert :: IO ()
-convert = foldIO getMP4Files (L.sink runCommand)
+convert =
+  let (mp4Directory, mp3Directory) = runReader getDirectories appConfig
+  in
+    foldIO (getMP4FilesFromPath mp4Directory) (L.sink (runCommand mp3Directory))
