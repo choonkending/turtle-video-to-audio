@@ -2,9 +2,9 @@ name:                video-to-audio
 version:             0.1.0.0
 github:              "githubuser/video-to-audio"
 license:             BSD3
-author:              "Author name here"
+author:              "Choon Ken Ding"
 maintainer:          "example@example.com"
-copyright:           "2019 Author name here"
+copyright:           "2020 Choon Ken Ding"
 
 extra-source-files:
 - README.md
@@ -25,14 +25,24 @@ dependencies:
 - text
 - foldl
 - containers
+- mtl
 
 library:
   source-dirs: src
 
 executables:
-  video-to-audio-exe:
+  convert:
+    source-dirs:         driver/convert
     main:                Main.hs
-    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - video-to-audio
+  stitch:
+    source-dirs:         driver/stitch
+    main:                Main.hs
     ghc-options:
     - -threaded
     - -rtsopts
