@@ -26,6 +26,7 @@ dependencies:
 - foldl
 - containers
 - mtl
+- either
 
 library:
   source-dirs: src
