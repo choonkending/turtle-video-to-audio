@@ -5,9 +5,11 @@ module Config where
 import Prelude (id)
 import Data.Text (Text)
 import Data.Map (Map, fromList, findWithDefault, lookup)
-import Data.Maybe (maybe)
+import Data.Either (Either)
+import Data.Either.Combinators (maybeToRight)
 
 type Config = Map Text Text
+data ConfigError = ConfigNotFound
 
 defaultEditingFileName :: Text
 defaultEditingFileName = "NBM INTRO.mp3"
@@ -29,7 +31,5 @@ appConfig = fromList [
     ("INTRO_FILENAME", findWithDefault defaultEditingFileName "NBM" editingTemplateConfig)
   ]
 
--- Consider returning a Maybe Text in the future
--- Defaulting to an empty string seems like we're handling it at the wrong place
-lookUpConfig :: Text -> Config -> Text
-lookUpConfig name config = maybe "" id (lookup name config)
+lookUpConfig :: Text -> Config -> Either ConfigError Text
+lookUpConfig name config = maybeToRight ConfigNotFound (lookup name config)

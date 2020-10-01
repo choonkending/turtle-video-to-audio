@@ -9,7 +9,8 @@ import Turtle.Shell (Shell, foldIO)
 import Turtle.Pattern (suffix)
 import Turtle.Format (format, fp)
 import Config (appConfig, lookUpConfig, Config)
-import Control.Monad.Reader (Reader, runReader, asks, return)
+import Control.Monad.Reader (ReaderT, runReaderT, asks, return)
+import Control.Applicative (liftA2)
 
 getMP3FilesFromPath :: Turtle.Text -> Shell Turtle.FilePath
 getMP3FilesFromPath filePath = find (suffix ".mp3") $ Turtle.fromText filePath
@@ -20,20 +21,19 @@ createArguments introFileName outputDirectory mainFilePath =
       outputFileName = outputDirectory <> format fp (Turtle.filename mainFilePath)
   in ["-i", introFileName, "-i", mainFileName, "-filter_complex", "concat=n=2:v=0:a=1", outputFileName]
 
-getFilesAndPaths :: Reader Config (Turtle.Text, Turtle.Text, Turtle.Text)
-getFilesAndPaths = do
-  inputDirectory <- asks (lookUpConfig "EDIT_INPUT_DIRECTORY")
-  outputDirectory <- asks (lookUpConfig "EDIT_OUTPUT_DIRECTORY")
-  editingTemplateDirectory <- asks (lookUpConfig "EDITING_TEMPLATE_DIRECTORY")
-  introFileName <- asks (lookUpConfig "INTRO_FILENAME")
-  return (inputDirectory, outputDirectory, editingTemplateDirectory <> introFileName)
-
 runCommand :: Turtle.Text -> Turtle.Text -> Turtle.FilePath -> IO ()
 runCommand introFileName outputDirectory filePath = proc "ffmpeg" (createArguments introFileName outputDirectory filePath) Turtle.empty >>= print
 
-stitch :: IO ()
-stitch = let
-  (inputDirectory, outputDirectory, introFileName) = runReader getFilesAndPaths appConfig
-  in
-    foldIO (getMP3FilesFromPath inputDirectory) (L.sink (runCommand introFileName outputDirectory))
+appStitch :: ReaderT Config IO ()
+appStitch = do
+  eitherInputDirectory <- asks (lookUpConfig "EDIT_INPUT_DIRECTORY")
+  eitherOutputDirectory <- asks (lookUpConfig "EDIT_OUTPUT_DIRECTORY")
+  eitherTemplateDirectory <- asks (lookUpConfig "EDITING_TEMPLATE_DIRECTORY")
+  eitherIntroFilename <- asks (lookUpConfig "INTRO_FILENAME")
+  let eitherIntroFilePath = liftA2 (<>) eitherTemplateDirectory eitherIntroFilename
+  case (eitherInputDirectory, eitherOutputDirectory, eitherIntroFilePath) of
+    (Right inputDirectory, Right outputDirectory, Right introFilePath) -> foldIO (getMP3FilesFromPath inputDirectory) (L.sink (runCommand introFilePath outputDirectory))
+    (_, _, _) -> return ()
 
+stitch :: IO ()
+stitch = runReaderT appStitch appConfig
