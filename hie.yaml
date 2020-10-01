@@ -1,0 +1,3 @@
+cradle:
+  stack:
+    component: "video-to-audio:lib"
