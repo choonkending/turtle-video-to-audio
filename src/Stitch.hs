@@ -10,7 +10,6 @@ import Turtle.Pattern (suffix)
 import Turtle.Format (format, fp)
 import Config (appConfig, lookUpConfig, Config)
 import Control.Monad.Reader (ReaderT, runReaderT, asks, return, liftIO)
-import Control.Applicative (liftA2)
 
 getMP3FilesFromPath :: Turtle.Text -> Shell Turtle.FilePath
 getMP3FilesFromPath filePath = find (suffix ".mp3") $ Turtle.fromText filePath
@@ -28,9 +27,7 @@ appStitch :: ReaderT Config IO ()
 appStitch = do
   eitherInputDirectory <- asks (lookUpConfig "EDIT_INPUT_DIRECTORY")
   eitherOutputDirectory <- asks (lookUpConfig "EDIT_OUTPUT_DIRECTORY")
-  eitherTemplateDirectory <- asks (lookUpConfig "EDITING_TEMPLATE_DIRECTORY")
-  eitherIntroFilename <- asks (lookUpConfig "INTRO_FILENAME")
-  let eitherIntroFilePath = liftA2 (<>) eitherTemplateDirectory eitherIntroFilename
+  eitherIntroFilePath <- asks (lookUpConfig "INTRO_FILEPATH")
   case (eitherInputDirectory, eitherOutputDirectory, eitherIntroFilePath) of
     (Right inputDirectory, Right outputDirectory, Right introFilePath) -> foldIO (getMP3FilesFromPath inputDirectory) (L.sink (runCommand introFilePath outputDirectory))
     (_, _, _) -> liftIO $ putStrLn "Error: Config value not found"

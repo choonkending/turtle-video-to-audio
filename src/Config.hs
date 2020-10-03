@@ -2,7 +2,7 @@
 
 module Config where
 
-import Prelude (id)
+import Prelude (id, (<>))
 import Data.Text (Text)
 import Data.Map (Map, fromList, findWithDefault, lookup)
 import Data.Either (Either)
@@ -21,14 +21,16 @@ editingTemplateConfig = fromList [
      ("BSV-OFFSITE", "BSV INTRO - OFFSITE.mp3")
   ]
 
+defaultEditingFilePath :: Text
+defaultEditingFilePath = "/Users/Ken/Documents/Buddhist/Editing Templates/" <> findWithDefault defaultEditingFileName "NBM" editingTemplateConfig
+
 appConfig :: Config
 appConfig = fromList [
     ("MP4_DIRECTORY", "/Users/Ken/Downloads/convert/mp4/"),
     ("MP3_DIRECTORY", "/Users/Ken/Downloads/convert/mp3/"),
     ("EDIT_INPUT_DIRECTORY", "/Users/Ken/Downloads/convert/edit/"),
     ("EDIT_OUTPUT_DIRECTORY", "/Users/Ken/Downloads/convert/final/"),
-    ("EDITING_TEMPLATE_DIRECTORY", "/Users/Ken/Documents/Buddhist/Editing Templates/"),
-    ("INTRO_FILENAME", findWithDefault defaultEditingFileName "NBM" editingTemplateConfig)
+    ("INTRO_FILEPATH", defaultEditingFilePath)
   ]
 
 lookUpConfig :: Text -> Config -> Either ConfigError Text
