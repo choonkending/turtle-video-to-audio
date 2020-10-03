@@ -10,7 +10,7 @@ import Turtle.Pattern (suffix)
 import Turtle.Format (format, fp)
 import Config (appConfig, lookUpConfig, Config)
 import Data.Either (either)
-import Control.Monad.Reader (MonadReader, MonadIO, Reader, ReaderT, runReaderT, asks, return)
+import Control.Monad.Reader (MonadReader, MonadIO, Reader, ReaderT, runReaderT, asks, return, liftIO)
 
 createArguments :: Turtle.Text -> Turtle.FilePath -> [Turtle.Text]
 createArguments mp3Directory filePath =
@@ -31,7 +31,7 @@ appConvert = do
   eitherMP3Directory <- asks (lookUpConfig "MP3_DIRECTORY")
   case (eitherMP4Directory, eitherMP3Directory) of
     (Right mp4Dir, Right mp3Dir) -> foldIO (getMP4FilesFromPath mp4Dir) (L.sink (runCommand mp3Dir))
-    (_, _) -> return () -- putStrLn "Error " was not working
+    (_, _) -> liftIO $ putStrLn "Error: Config value not found"
 
 convert :: IO ()
 convert = runReaderT appConvert appConfig

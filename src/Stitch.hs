@@ -9,7 +9,7 @@ import Turtle.Shell (Shell, foldIO)
 import Turtle.Pattern (suffix)
 import Turtle.Format (format, fp)
 import Config (appConfig, lookUpConfig, Config)
-import Control.Monad.Reader (ReaderT, runReaderT, asks, return)
+import Control.Monad.Reader (ReaderT, runReaderT, asks, return, liftIO)
 import Control.Applicative (liftA2)
 
 getMP3FilesFromPath :: Turtle.Text -> Shell Turtle.FilePath
@@ -33,7 +33,7 @@ appStitch = do
   let eitherIntroFilePath = liftA2 (<>) eitherTemplateDirectory eitherIntroFilename
   case (eitherInputDirectory, eitherOutputDirectory, eitherIntroFilePath) of
     (Right inputDirectory, Right outputDirectory, Right introFilePath) -> foldIO (getMP3FilesFromPath inputDirectory) (L.sink (runCommand introFilePath outputDirectory))
-    (_, _, _) -> return ()
+    (_, _, _) -> liftIO $ putStrLn "Error: Config value not found"
 
 stitch :: IO ()
 stitch = runReaderT appStitch appConfig
